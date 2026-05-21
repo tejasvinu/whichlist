@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>whichlist</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Brutalist Color Palette */
+            --concrete: #EAEAEA;
+            --black: #0A0A0A;
+            --white: #F4F4F4;
+            --volt: #CCFF00;
+            --vermillion: #FF3300;
+            --cobalt: #0033FF;
+
+            /* Typography */
+            --font-display: 'Anton', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+
+            /* Borders & Shadows */
+            --border-w: 3px;
+            --shadow: 8px 8px 0px var(--black);
+            --shadow-hover: 4px 4px 0px var(--black);
+            
+            /* Spacing */
+            --gap: 1.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--concrete);
+            color: var(--black);
+            font-family: var(--font-mono);
+            line-height: 1.5;
+            padding: var(--gap);
+            /* Custom brutalist grid background */
+            background-image: radial-gradient(var(--black) 1px, transparent 1px);
+            background-size: 32px 32px;
+            background-position: -1px -1px;
+        }
+
+        ::selection {
+            background: var(--volt);
+            color: var(--black);
+        }
+
+        /* Nav Header */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--black);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border: var(--border-w) solid var(--black);
+            box-shadow: var(--shadow);
+            margin-bottom: var(--gap);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .nav-brand {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .status-dot {
+            width: 12px; height: 12px;
+            background: var(--volt);
+            border: 2px solid var(--black);
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Core Bento Grid System */
+        .bento-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--gap);
+            grid-auto-flow: dense;
+        }
+
+        /* Generic Bento Block */
+        .block {
+            background: var(--white);
+            border: var(--border-w) solid var(--black);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .block-hover:hover {
+            transform: translate(4px, 4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .block-header {
+            padding: 0.5rem 1rem;
+            border-bottom: var(--border-w) solid var(--black);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: var(--black);
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .block-content {
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Specific Blocks - HERO */
+        .block-hero-title {
+            grid-column: span 3;
+            grid-row: span 2;
+            background: var(--volt);
+        }
+        .block-hero-title h1 {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 10vw, 11rem);
+            line-height: 0.85;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .block-hero-meta {
+            grid-column: span 1;
+            grid-row: span 1;
+            background: var(--white);
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .block-hero-graphic {
+            grid-column: span 1;
+            grid-row: span 1;
+            background: var(--vermillion);
+            background-image: repeating-linear-gradient(45deg, var(--black) 0, var(--black) 2px, transparent 2px, transparent 10px);
+        }
+
+        .block-hero-desc {
+            grid-column: span 2;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .block-hero-cta {
+            grid-column: span 2;
+            background: var(--black);
+            color: var(--white);
+            cursor: pointer;
+        }
+        .block-hero-cta .block-content {
+            align-items: center;
+        }
+        .block-hero-cta h2 {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+        .block-hero-cta:hover h2 {
+            color: var(--volt);
+        }
+
+        /* Divider Bar */
+        .bento-divider {
+            grid-column: span 4;
+            background: var(--black);
+            color: var(--white);
+            padding: 1rem;
+            border: var(--border-w) solid var(--black);
+            box-shadow: var(--shadow);
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        /* Features - PHASE 1 */
+        .feat-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .block-feat-1 {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .block-feat-2 {
+            grid-column: span 1;
+            grid-row: span 2;
+            background: var(--white);
+        }
+
+        .block-feat-3 {
+            grid-column: span 1;
+            grid-row: span 2;
+            background: var(--concrete);
+        }
+
+        /* Abstract Numbering inside blocks */
+        .huge-num {
+            position: absolute;
+            bottom: -20px;
+            right: -10px;
+            font-family: var(--font-display);
+            font-size: 15rem;
+            color: rgba(0,0,0,0.05);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        /* Phase 2: AI Mode */
+        .ai-theme {
+            background: var(--cobalt);
+            color: var(--white);
+        }
+        .ai-theme .block-header {
+            background: var(--volt);
+            color: var(--black);
+            border-bottom-color: var(--black);
+        }
+
+        .block-ai-1 { grid-column: span 2; }
+        .block-ai-2 { grid-column: span 2; }
+
+        /* Utilities */
+        .badge {
+            display: inline-block;
+            border: 2px solid var(--black);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: var(--white);
+            color: var(--black);
+            margin-bottom: 1rem;
+            border-radius: 50px;
+        }
+
+        .marquee {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            border-top: var(--border-w) solid var(--black);
+            border-bottom: var(--border-w) solid var(--black);
+            background: var(--volt);
+            padding: 0.5rem 0;
+            font-weight: 700;
+            margin: 2rem 0;
+        }
+        .marquee-inner {
+            display: inline-block;
+            animation: scroll 10s linear infinite;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Barcode Generator Box */
+        .barcode-box {
+            display: flex;
+            height: 60px;
+            gap: 4px;
+            margin-top: 1rem;
+        }
+        .barcode-line {
+            background: var(--black);
+            height: 100%;
+        }
+
+        /* Media Queries */
+        @media (max-width: 1024px) {
+            .bento-wrapper {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .block-hero-title, .block-hero-desc, .block-hero-cta, .bento-divider, .block-ai-1, .block-ai-2 {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .bento-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .block-hero-title, .block-hero-meta, .block-hero-graphic, .block-hero-desc, .block-hero-cta, .bento-divider, .block-feat-1, .block-feat-2, .block-feat-3, .block-ai-1, .block-ai-2 {
+                grid-column: span 1;
+            }
+            .nav-brand { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Nav -->
+    <nav class="nav-bar">
+        <div class="nav-brand">whichlist</div>
+        <div class="nav-status">
+            <span>SYS.ONLINE</span>
+            <div class="status-dot"></div>
+        </div>
+    </nav>
+
+    <!-- Main Bento Grid -->
+    <main class="bento-wrapper">
+        
+        <!-- HERO: Huge Title -->
+        <div class="block block-hero-title">
+            <div class="block-header">
+                <span>001</span>
+                <span>Manifesto</span>
+            </div>
+            <div class="block-content">
+                <h1>TRACK.<br>RATE.<br>ORGANIZE.</h1>
+            </div>
+        </div>
+
+        <!-- HERO: Meta Info -->
+        <div class="block block-hero-meta block-hover">
+            <div class="block-header">
+                <span>Build</span>
+            </div>
+            <div class="block-content" style="padding: 1rem;">
+                <h3 style="font-family: var(--font-display); font-size: 3rem;">V 1.0.0</h3>
+                <p>MongoDB / Next.js</p>
+                <div class="barcode-box" id="barcode"></div>
+            </div>
+        </div>
+
+        <!-- HERO: Abstract Graphic -->
+        <div class="block block-hero-graphic block-hover">
+            <!-- Pure CSS repeating pattern applied via class -->
+        </div>
+
+        <!-- HERO: Description -->
+        <div class="block block-hero-desc block-hover">
+            <div class="block-header"><span>Synopsis</span></div>
+            <div class="block-content">
+                Not your average tracker. A personalized, ad-free, deeply robust web application to curate your cinematic universe. Foundation first. AI later.
+            </div>
+        </div>
+
+        <!-- HERO: CTA -->
+        <div class="block block-hero-cta block-hover">
+            <div class="block-content">
+                <h2>GET STARTED &rarr;</h2>
+            </div>
+        </div>
+
+        <!-- DIVIDER: PHASE 1 -->
+        <div class="bento-divider">
+            <span>PHASE 01</span>
+            <span>CORE FOUNDATION (DEPLOYED)</span>
+        </div>
+
+        <!-- FEAT 1: Discovery -->
+        <div class="block block-feat-1 block-hover">
+            <div class="block-header"><span>Module 01</span><span>TMDB API</span></div>
+            <div class="block-content">
+                <div class="badge">GLOBAL DISCOVERY</div>
+                <h3 class="feat-title">Query the cinematic mainframe.</h3>
+                <p>Instant access to TMDB's `multi-search` endpoint. Pull high-res posters, cast & crew data, synopses, and real-time trending dashboards without latency.</p>
+                <div class="huge-num">01</div>
+            </div>
+        </div>
+
+        <!-- FEAT 2: Your List -->
+        <div class="block block-feat-2 block-hover" style="background: var(--vermillion); color: var(--white);">
+            <div class="block-header" style="background: var(--white); color: var(--black);"><span>Module 02</span><span>NextAuth</span></div>
+            <div class="block-content">
+                <h3 class="feat-title">Your List</h3>
+                <p style="font-weight: 700;">Secure login. Isolated MongoDB schema. Your ratings, status tags, and text reviews belong solely to you.</p>
+                <div class="huge-num" style="color: rgba(255,255,255,0.2);">02</div>
+            </div>
+        </div>
+
+        <!-- FEAT 3: CRUD -->
+        <div class="block block-feat-3 block-hover">
+            <div class="block-header"><span>Module 03</span><span>State MGT</span></div>
+            <div class="block-content">
+                <h3 class="feat-title">State Mechanics</h3>
+                <p>Flawless CRUD. Move media from 'Plan to Watch' to 'Completed'. Dynamic caching ensures instant grid loading.</p>
+                <div class="huge-num">03</div>
+            </div>
+        </div>
+
+        <!-- DIVIDER: PHASE 2 -->
+        <div class="bento-divider" style="background: var(--cobalt); color: var(--volt); border-color: var(--black);">
+            <span>PHASE 02</span>
+            <span>AI SUPERCHARGER (INCOMING)</span>
+        </div>
+
+        <!-- AI 1: Vibe Search -->
+        <div class="block block-ai-1 ai-theme block-hover">
+            <div class="block-header"><span>AI.01</span><span>Gemini Integration</span></div>
+            <div class="block-content">
+                <div class="badge" style="background: var(--volt);">NATURAL LANGUAGE</div>
+                <h3 class="feat-title">Vibe Search Engine</h3>
+                <p>Bypass rigid genre categories. Query your library using raw natural language. Example input: <i>"Show me a cozy snowy mystery with high stakes."</i></p>
+            </div>
+        </div>
+
+        <!-- AI 2: Taste Profiling -->
+        <div class="block block-ai-2 ai-theme block-hover">
+            <div class="block-header"><span>AI.02</span><span>Psychological Model</span></div>
+            <div class="block-content">
+                <div class="badge" style="background: var(--volt);">ROAST & TOAST</div>
+                <h3 class="feat-title">Taste Profiling</h3>
+                <p>AI deeply analyzes your 5-star ratings and written reviews to generate an uncompromising, auto-tagged psychological taste profile.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Endless Marquee Footer -->
+    <div class="marquee">
+        <div class="marquee-inner">
+            whichlist &nbsp;&mdash;&nbsp; THE MATRIX [WATCHING] &nbsp;&mdash;&nbsp; SUCCESSION [COMPLETED] &nbsp;&mdash;&nbsp; DUNE [PLAN TO WATCH] &nbsp;&mdash;&nbsp; whichlist &nbsp;&mdash;&nbsp; THE MATRIX [WATCHING] &nbsp;&mdash;&nbsp; SUCCESSION [COMPLETED] &nbsp;&mdash;&nbsp; DUNE [PLAN TO WATCH] &nbsp;&mdash;&nbsp;
+        </div>
+    </div>
+
+    <script>
+        // Generate random brutalist barcode
+        const barcodeContainer = document.getElementById('barcode');
+        if (barcodeContainer) {
+            for (let i = 0; i < 20; i++) {
+                const line = document.createElement('div');
+                line.className = 'barcode-line';
+                // Random width between 2px and 8px
+                line.style.width = Math.floor(Math.random() * 6) + 2 + 'px';
+                barcodeContainer.appendChild(line);
+            }
+        }
+    </script>
+</body>
+</html>
