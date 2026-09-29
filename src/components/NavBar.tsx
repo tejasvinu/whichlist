@@ -59,6 +59,14 @@ export function NavBar() {
         {session ? (
           <>
             <Link 
+              href="/discover" 
+              onMouseEnter={() => sound.play("hover")}
+              onClick={() => sound.play("click")}
+              className="text-zinc-600 hover:text-zinc-950 hover:underline underline-offset-4 decoration-1 transition-all tracking-wider"
+            >
+              Discover
+            </Link>
+            <Link 
               href="/library" 
               onMouseEnter={() => sound.play("hover")}
               onClick={() => sound.play("click")}

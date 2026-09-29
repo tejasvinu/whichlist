@@ -3,14 +3,14 @@ class SoundSystem {
 
   private init() {
     if (!this.ctx && typeof window !== "undefined") {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
       }
     }
   }
 
-  public play(type: "hover" | "click" | "success" | "laser" | "trash") {
+  public play(type: "hover" | "click" | "success" | "laser" | "trash" | "whoosh") {
     try {
       this.init();
       if (!this.ctx) return;
@@ -70,6 +70,15 @@ class SoundSystem {
         gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
         osc.start(t);
         osc.stop(t + 0.18);
+      } else if (type === "whoosh") {
+        // Quick aerodynamic card sweep
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(280, t);
+        osc.frequency.exponentialRampToValueAtTime(80, t + 0.16);
+        gain.gain.setValueAtTime(0.06, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+        osc.start(t);
+        osc.stop(t + 0.16);
       }
     } catch {
       // Audio context block/unsupported

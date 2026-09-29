@@ -5,6 +5,7 @@ import { WatchlistItem } from "@/models/WatchlistItem";
 import { SharedUniverse, ISharedUniverse } from "@/models/SharedUniverse";
 import { UserUniverse } from "@/models/UserUniverse";
 import { WATCH_STATUSES, MEDIA_TYPES } from "@/lib/constants";
+import { upsertWatchlistItem } from "@/lib/watchlist";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -96,7 +97,7 @@ export async function GET(request: Request) {
   }
 
   // 3. Combine and sort
-  let combined = [...watchlistItems, ...universeItems];
+  const combined = [...watchlistItems, ...universeItems];
 
   if (sort === "rating") {
     combined.sort((a, b) => {
@@ -151,23 +152,19 @@ export async function POST(request: Request) {
 
     await connectDB();
 
-    const item = await WatchlistItem.findOneAndUpdate(
-      { userId: session.user.id, tmdbId, mediaType },
-      {
-        userId: session.user.id,
-        tmdbId,
-        mediaType,
-        title,
-        posterPath: posterPath ?? null,
-        releaseYear: releaseYear ?? null,
-        status: status ?? "Plan to Watch",
-        rating: rating ?? undefined,
-        review: review ?? undefined,
-        tags: tags ?? [],
-        dateAdded: new Date(),
-      },
-      { upsert: true, new: true }
-    );
+    const { item } = await upsertWatchlistItem({
+      userId: session.user.id,
+      tmdbId,
+      mediaType,
+      title,
+      posterPath: posterPath ?? null,
+      releaseYear: releaseYear ?? null,
+      status: status ?? "Plan to Watch",
+      rating: rating ?? undefined,
+      review: review ?? undefined,
+      tags: tags ?? [],
+      mergeTags: false,
+    });
 
     return NextResponse.json({ item }, { status: 201 });
   } catch (err: unknown) {

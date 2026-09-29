@@ -29,6 +29,10 @@ export interface TmdbSearchResult {
   release_date?: string;
   first_air_date?: string;
   vote_average: number;
+  genre_ids?: number[];
+  popularity?: number;
+  vote_count?: number;
+  original_language?: string;
 }
 
 export interface TmdbMultiSearchResponse {
@@ -36,7 +40,10 @@ export interface TmdbMultiSearchResponse {
 }
 
 export interface TmdbTrendingResponse {
+  page?: number;
   results: TmdbSearchResult[];
+  total_pages?: number;
+  total_results?: number;
 }
 
 export interface TmdbGenre {
@@ -65,6 +72,11 @@ export interface TmdbVideo {
   name: string;
 }
 
+export interface TmdbKeyword {
+  id: number;
+  name: string;
+}
+
 export interface TmdbMovieDetails {
   id: number;
   title: string;
@@ -74,8 +86,12 @@ export interface TmdbMovieDetails {
   release_date: string;
   runtime: number | null;
   genres: TmdbGenre[];
+  popularity?: number;
+  vote_average?: number;
+  original_language?: string;
   credits?: { cast: TmdbCastMember[]; crew: TmdbCrewMember[] };
   videos?: { results: TmdbVideo[] };
+  keywords?: { keywords: TmdbKeyword[] };
 }
 
 export interface TmdbTvDetails {
@@ -87,8 +103,32 @@ export interface TmdbTvDetails {
   first_air_date: string;
   episode_run_time: number[];
   genres: TmdbGenre[];
+  popularity?: number;
+  vote_average?: number;
+  original_language?: string;
+  created_by?: { id: number; name: string }[];
   credits?: { cast: TmdbCastMember[]; crew: TmdbCrewMember[] };
   videos?: { results: TmdbVideo[] };
+  keywords?: { results: TmdbKeyword[] };
+}
+
+let cachedGenreMap: Map<number, string> | null = null;
+
+export async function getGenreMap(): Promise<Map<number, string>> {
+  if (cachedGenreMap) return cachedGenreMap;
+  try {
+    const [movieGenres, tvGenres] = await Promise.all([
+      tmdbFetch<{ genres: TmdbGenre[] }>("/genre/movie/list"),
+      tmdbFetch<{ genres: TmdbGenre[] }>("/genre/tv/list"),
+    ]);
+    const map = new Map<number, string>();
+    movieGenres.genres?.forEach((g) => map.set(g.id, g.name));
+    tvGenres.genres?.forEach((g) => map.set(g.id, g.name));
+    cachedGenreMap = map;
+    return map;
+  } catch {
+    return cachedGenreMap ?? new Map<number, string>();
+  }
 }
 
 export function posterUrl(path: string | null, size: "w342" | "w500" | "original" = "w500") {
@@ -113,19 +153,27 @@ export async function searchMulti(query: string) {
   });
 }
 
-export async function getTrending() {
-  return tmdbFetch<TmdbTrendingResponse>("/trending/all/week");
+export async function getTrending(page: number = 1) {
+  return tmdbFetch<TmdbTrendingResponse>("/trending/all/week", {
+    page: page.toString(),
+  });
+}
+
+export async function getRecommendations(type: "movie" | "tv", id: number, page: number = 1) {
+  return tmdbFetch<TmdbTrendingResponse>(`/${type}/${id}/recommendations`, {
+    page: page.toString(),
+  });
 }
 
 export async function getMovieDetails(id: number) {
   return tmdbFetch<TmdbMovieDetails>(`/movie/${id}`, {
-    append_to_response: "credits,videos",
+    append_to_response: "credits,videos,keywords",
   });
 }
 
 export async function getTvDetails(id: number) {
   return tmdbFetch<TmdbTvDetails>(`/tv/${id}`, {
-    append_to_response: "credits,videos",
+    append_to_response: "credits,videos,keywords",
   });
 }
 

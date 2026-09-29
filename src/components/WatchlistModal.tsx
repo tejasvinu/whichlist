@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { WATCH_STATUSES, type WatchStatus } from "@/lib/constants";
 import { sound } from "@/lib/audio";
 
@@ -23,6 +23,13 @@ interface WatchlistModalProps {
     review?: string;
     tags?: string[];
   } | null;
+  initialStatus?: WatchStatus;
+  customSubmit?: (data: {
+    status: WatchStatus;
+    rating?: number | null;
+    review?: string;
+    tags?: string[];
+  }) => Promise<void>;
   onSaved: () => void;
 }
 
@@ -31,29 +38,28 @@ export function WatchlistModal({
   onClose,
   media,
   existingItem,
+  initialStatus,
+  customSubmit,
   onSaved,
 }: WatchlistModalProps) {
-  const [status, setStatus] = useState<WatchStatus>("Plan to Watch");
-  const [rating, setRating] = useState<string>("");
-  const [review, setReview] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
+  const [status, setStatus] = useState<WatchStatus>(() => existingItem?.status ?? initialStatus ?? "Plan to Watch");
+  const [rating, setRating] = useState<string>(() => existingItem?.rating?.toString() ?? "");
+  const [review, setReview] = useState(() => existingItem?.review ?? "");
+  const [tags, setTags] = useState<string[]>(() => existingItem?.tags ?? []);
   const [loading, setLoading] = useState(false);
   const [generatingTags, setGeneratingTags] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (existingItem) {
-      setStatus(existingItem.status);
-      setRating(existingItem.rating?.toString() ?? "");
-      setReview(existingItem.review ?? "");
-      setTags(existingItem.tags ?? []);
-    } else {
-      setStatus("Plan to Watch");
-      setRating("");
-      setReview("");
-      setTags([]);
-    }
-  }, [existingItem, open]);
+  const [prevKey, setPrevKey] = useState<string | null>(null);
+  const currentKey = `${open ? "1" : "0"}-${existingItem?._id ?? "new"}-${initialStatus ?? ""}`;
+
+  if (prevKey !== currentKey) {
+    setPrevKey(currentKey);
+    setStatus(existingItem?.status ?? initialStatus ?? "Plan to Watch");
+    setRating(existingItem?.rating?.toString() ?? "");
+    setReview(existingItem?.review ?? "");
+    setTags(existingItem?.tags ?? []);
+  }
 
   if (!open) return null;
 
@@ -98,7 +104,9 @@ export function WatchlistModal({
     };
 
     try {
-      if (existingItem) {
+      if (customSubmit) {
+        await customSubmit(payload);
+      } else if (existingItem) {
         const res = await fetch(`/api/watchlist/${existingItem._id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
